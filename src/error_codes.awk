@@ -1,4 +1,8 @@
-#TODO match a comment which contains "[Ee]rror [Cc]odes" or doesn't
+#Looks through (header) files for any line starting with "/*[something][Ee]rror [Cc]odes"
+#From there it tracks all the "#define CL_SOMETHING number" error numbers
+#It stops tracking when it reaches another line starting with "/*" which doesn't fit the expression above
+#it then prints out a c file containing the function cluErrorString which converts each numerical error code
+#into a string of it's defined name.
 BEGIN {
     record=0
 }
@@ -14,6 +18,7 @@ BEGIN {
 
 /#define CL_*/ {
     if (record==1) {
+        #we use $3 here so that we don't have to bother with includes for the proper definitions.
         s = s"    case "$3":\n      return \""$2"\";\n"
     }
 }
