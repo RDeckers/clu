@@ -1,6 +1,7 @@
 #include <clu.h>
 #include <stdlib.h>
 #include <utilities/logging.h>
+#include <utilities/file.h>
 
 cl_uint cluPlatformCount(){
   cl_uint num_platforms;
@@ -130,7 +131,7 @@ void cluDefaultContextErrorHandler(const char *errinfo, const void  *private_inf
 
 cl_context cluCreateContextFromTypes(cl_platform_id platform, cl_device_type device_types){
   cl_int ret;
-  cl_context context = clCreateContextFromType((cl_context_properties[]){CL_CONTEXT_PLATFORM,platform}, device_types, cluDefaultContextErrorHandler, NULL, &ret);
+  cl_context context = clCreateContextFromType((cl_context_properties[]){CL_CONTEXT_PLATFORM,(cl_context_properties)platform}, device_types, cluDefaultContextErrorHandler, NULL, &ret);
   if(ret != CL_SUCCESS){//HUH?!
     report(FAIL, "clCreateContextFromType returned: %s (%d)", cluErrorString(ret), ret);
   }
@@ -159,10 +160,10 @@ int cluCreateCommandQueues(cl_context context, cl_device_id *devices,  int n_dev
 }
 
 cl_program cluProgramFromFilename(cl_context context, const char *filename){
-  const char *program_src = NULL;
+  char *program_src = NULL;
   file_to_string(filename, 0, &program_src);
   cl_int ret;
-  cl_program program = clCreateProgramWithSource(context, 1, &program_src, NULL, &ret);
+  cl_program program = clCreateProgramWithSource(context, 1, (const char**)&program_src, NULL, &ret);
   if(CL_SUCCESS != ret){
     report(FAIL, "clCreateProgramWithSource returned: %s (%d)", cluErrorString(ret), ret);
   }

@@ -43,7 +43,7 @@ OBJ_FILES = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(C_FILES))
 LIB_NAME := clu
 
 LD_FLAGS += --std=gnu99 -march=native -lOpenCL -lutilities
-C_FLAGS += --std=gnu99 -O2 -pipe -march=native -I$(PROJECT_DIR)headers
+C_FLAGS += --std=gnu99 -Werror -O2 -pipe -march=native -I$(PROJECT_DIR)headers
 
 
 lib: $(OBJ_FILES)
