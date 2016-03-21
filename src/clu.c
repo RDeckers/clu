@@ -125,14 +125,19 @@ size_t cluGetDeviceInfo(cl_device_id device, cl_device_info param, int max_size,
   }
 }
 
-void cluDefaultContextErrorHandler(const char *errinfo, const void  *private_info, size_t  cb, void  *user_data){
+void CL_CALLBACK cluDefaultContextErrorHandler(const char *errinfo, const void  *private_info, size_t  cb, void  *user_data){
   report(FAIL, "Context generated error: %s", errinfo);
 }
 
 cl_context cluCreateContextFromTypes(cl_platform_id platform, cl_device_type device_types){
   cl_int ret;
-  cl_context context = clCreateContextFromType((cl_context_properties[]){CL_CONTEXT_PLATFORM,(cl_context_properties)platform}, device_types, cluDefaultContextErrorHandler, NULL, &ret);
-  if(ret != CL_SUCCESS){//HUH?!
+  cl_context context = clCreateContextFromType(
+    (cl_context_properties[]){CL_CONTEXT_PLATFORM,(cl_context_properties)platform, 0},
+    device_types,
+    cluDefaultContextErrorHandler,
+    NULL,
+    &ret);
+  if(ret != CL_SUCCESS){
     report(FAIL, "clCreateContextFromType returned: %s (%d)", cluErrorString(ret), ret);
   }
   return context;
