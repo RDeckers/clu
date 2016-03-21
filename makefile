@@ -1,15 +1,18 @@
 rwildcard=$(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2) $(filter $(subst *, %,$2),$d))
 directories=$(sort $(dir $(wildcard $/*)))
 ifeq ($(OS),Windows_NT)
-	REPORT = @echo -e $1"
+FIX_PATH = $(subst /,\,$1)
+	REPORT = @echo $1
 	CHK_DIR_EXISTS = if not exist "$(strip $1)" mkdir "$(strip $1)"
 	NUKE = rmdir /s /q
-	COPY_DIR = xcopy $1 $2 /E /H /Y
-	FIX_PATH = $(subst /,\,$1)
+	COPY_DIR = xcopy $(call FIX_PATH,$1 $2) /E /H /Y
+	COPY_CONTENT = xcopy /s /Y $(call FIX_PATH,$1 $2)
+	COPY = xcopy $(call FIX_PATH,$1 $2) /Y
 	INSTALL_LIB_DIR := Z:/lib/
 	INSTALL_BIN_DIR := Z:/bin/
 	INSTALL_INCLUDE_DIR := Z:/include/
 	LIB_SUFFIX =.dll
+	OPENCL_HEADERS :=$(call rwildcard, Z:/include/CL/, *.h)
 else
 	REPORT = @echo -e "\e[4;1;37m$1\033[0m"
 	CHK_DIR_EXISTS = test -d $1 || mkdir -p $1
@@ -20,9 +23,10 @@ else
 	INSTALL_BIN_DIR := ~/bin/
 	INSTALL_INCLUDE_DIR := ~/include/
 	LIB_SUFFIX :=.so
+	OPENCL_HEADERS :=/usr/include/CL/*.h
 endif
 
-OPENCL_HEADERS :=/usr/include/CL/*.h
+
 
 PROJECT_DIR :=$(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 OBJ_DIR := $(PROJECT_DIR)obj
@@ -42,28 +46,28 @@ OBJ_FILES = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(C_FILES))
 
 LIB_NAME := clu
 
-LD_FLAGS += --std=gnu99 -march=native -lOpenCL -lutilities
-C_FLAGS += --std=gnu99 -Werror -O2 -pipe -march=native -I$(PROJECT_DIR)headers
+LD_FLAGS += --std=gnu99 -march=native -lOpenCL -lutilities -L$(INSTALL_LIB_DIR)
+C_FLAGS += --std=gnu99 -O2 -pipe -march=native -I$(PROJECT_DIR)headers -I$(INSTALL_INCLUDE_DIR)
 
 
 lib: $(OBJ_FILES)
 	$(call REPORT,Building $@)
 	$(call CHK_DIR_EXISTS, $(LIB_DIR))
-	gcc -shared $(LD_FLAGS) -o $(LIB_DIR)/lib$(LIB_NAME)$(LIB_SUFFIX) $(OBJ_FILES)
+	gcc -shared -o $(LIB_DIR)/lib$(LIB_NAME)$(LIB_SUFFIX) $(OBJ_FILES) $(LD_FLAGS)
 
 install: lib
 	$(call REPORT, Installing files...)
-	cp $(LIB_DIR)/lib$(LIB_NAME)$(LIB_SUFFIX) $(INSTALL_LIB_DIR)
-	cp -r $(PROJECT_DIR)headers/* $(INSTALL_INCLUDE_DIR)
+	$(call COPY, $(LIB_DIR)/lib$(LIB_NAME)$(LIB_SUFFIX),$(INSTALL_LIB_DIR))
+	$(call COPY_CONTENT, $(PROJECT_DIR)headers,$(INSTALL_INCLUDE_DIR))
 
 all : lib examples
 
-examples: lib $(EXAMPLES)
+examples: $(OBJ_FILES) $(EXAMPLES)
 
 $(EXAMPLE_BIN_DIR)% : $(EXAMPLE_DIR)%.c
 	$(call REPORT,Building $@)
 	$(call CHK_DIR_EXISTS, $(dir $@))
-	gcc $(C_FLAGS) $(LD_FLAGS) -o "$@" "$<" $(LIB_DIR)/lib$(LIB_NAME)$(LIB_SUFFIX)
+	gcc $(C_FLAGS) -o "$@" "$<" $(OBJ_FILES) $(LD_FLAGS)
 
 $(SRC_DIR)/%.c: $(SRC_DIR)/%.awk
 	$(call REPORT,Generating $@)
@@ -72,7 +76,7 @@ $(SRC_DIR)/%.c: $(SRC_DIR)/%.awk
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	$(call REPORT,Compiling $@)
 	$(call CHK_DIR_EXISTS, $(dir $@))
-	gcc -fpic $(C_FLAGS) -o "$@" -c "$<"
+	@gcc -fpic $(C_FLAGS) -o "$@" -c "$<"
 
 clean:
 	$(call REPORT,Cleaning...)
