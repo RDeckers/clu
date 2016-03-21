@@ -3,6 +3,7 @@
 #include <utilities/file.h>
 
 int main(int argc, char **argv){
+  REPORT_W_COLORS = 1;
   cl_platform_id *platforms = NULL;
   cl_device_id *devices = NULL;
   cl_uint n_platforms = cluGetPlatforms(&platforms, CLU_DYNAMIC);

@@ -1,5 +1,7 @@
 #ifndef _CLU_H
 #define _CLU_H
+
+#define CL_USE_DEPRECATED_OPENCL_1_2_APIS
 #include <CL/cl.h>
 
 #define CLU_DYNAMIC -1
