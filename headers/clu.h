@@ -22,6 +22,9 @@ cl_command_queue cluCreateCommandQueue(cl_context context, cl_device_id device);
 int cluCreateCommandQueues(cl_context context, cl_device_id *devices, int n_devices, cl_command_queue **queues);
 cl_program cluProgramFromFilename(cl_context context, const char *filename);
 
+int cluGetProgramLog(cl_program program, cl_device_id device, int max_size, char **log);
+size_t cluGetLogSize(cl_program program, cl_device_id device);
+
 const char* cluErrorString(cl_int error);
 
 #endif

@@ -159,7 +159,7 @@ int cluCreateCommandQueues(cl_context context, cl_device_id *devices,  int n_dev
     }
   }
   for(int i = 0; i < n_devices; i++){
-    *queues[i]  = cluCreateCommandQueue(context, devices[i]);
+    (*queues)[i]  = cluCreateCommandQueue(context, devices[i]);
   }
   return n_devices;
 }
@@ -174,4 +174,41 @@ cl_program cluProgramFromFilename(cl_context context, const char *filename){
   }
   free(program_src);
   return program;
+}
+
+size_t cluGetLogSize(cl_program program, cl_device_id device){
+  size_t size = 0;
+  cl_int ret;
+  ret = clGetProgramBuildInfo(program, device, CL_PROGRAM_BUILD_LOG, 0, NULL, &size);
+  if(CL_SUCCESS != ret){
+    report(FAIL, "clGetProgramBuildInfo returned: %s (%d)", cluErrorString(ret), ret);
+  }
+  report(INFO, "log size: %u", size);
+  return size;
+}
+
+int cluGetProgramLog(cl_program program, cl_device_id device, int max_size, char **log){
+  cl_int ret;
+  if(CLU_DYNAMIC == max_size){
+    size_t size = cluGetLogSize(program, device);
+    free(*log);
+    *log = size? malloc(size) : NULL;
+    if(NULL == *log){
+      report(FAIL, "Allocation failed!");
+      return 0;
+    }
+    report(PASS, "allocated space for log");
+    ret = clGetProgramBuildInfo(program, device, CL_PROGRAM_BUILD_LOG, size, (void*)*log, NULL);
+    if(CL_SUCCESS != ret){
+      report(FAIL, "clGetProgramBuildInfo returned: %s (%d)", cluErrorString(ret), ret);
+    }
+    return size;
+  }else{
+    size_t size = max_size;
+    ret = clGetProgramBuildInfo(program, device, CL_PROGRAM_BUILD_LOG, size, (void*)*log, NULL);
+    if(CL_SUCCESS != ret){
+      report(FAIL, "clGetProgramBuildInfo returned: %s (%d)", cluErrorString(ret), ret);
+    }
+    return size;
+  }
 }
