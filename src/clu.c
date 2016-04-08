@@ -8,6 +8,7 @@ cl_uint cluPlatformCount(){
   cl_int ret = clGetPlatformIDs(0, NULL, &num_platforms);
   if(CL_SUCCESS != ret){
     report(FAIL, "clGetPlatformIDs returned: %s (%d)", cluErrorString(ret), ret);
+    return 0;
   }
   return num_platforms;
 }
@@ -25,6 +26,7 @@ cl_uint cluGetPlatforms(cl_platform_id **platforms, int max_platform_count){
   cl_int ret = clGetPlatformIDs(platform_count, *platforms, NULL);
   if(CL_SUCCESS != ret){
     report(FAIL, "clGetPlatformIDs returned: %s (%d)", cluErrorString(ret), ret);
+    return 0;
   }
   return platform_count;
 }
@@ -34,6 +36,7 @@ size_t cluPlatformGetInfoSize(cl_platform_id platform, cl_platform_info param){
   cl_int ret = clGetPlatformInfo(platform, param, 0, NULL, &size);
   if(CL_SUCCESS != ret){
     report(FAIL, "clGetPlatformInfo returned: %s (%d)", cluErrorString(ret), ret);
+    return 0;
   }
   return size;
 }
@@ -50,6 +53,7 @@ size_t cluGetPlatformInfo(cl_platform_id platform, cl_platform_info param, int m
     ret = clGetPlatformInfo(platform, param, size, *output, NULL);
     if(CL_SUCCESS != ret){
       report(FAIL, "clGetPlatformInfo returned: %s (%d)", cluErrorString(ret), ret);
+      return 0;
     }
     return size;
   }
@@ -58,6 +62,7 @@ size_t cluGetPlatformInfo(cl_platform_id platform, cl_platform_info param, int m
     ret = clGetPlatformInfo(platform, param, size, *output, NULL);
     if(CL_SUCCESS != ret){
       report(FAIL, "clGetPlatformInfo returned: %s (%d)", cluErrorString(ret), ret);
+      return 0;
     }
     return size;
   }
@@ -69,6 +74,7 @@ cl_uint cluDeviceCount(cl_platform_id platform, cl_device_type device_type){
   ret = clGetDeviceIDs(platform, device_type, 0, NULL, &device_count);
   if(CL_SUCCESS != ret){
     report(FAIL, "clGetDeviceIDs returned: %s (%d)", cluErrorString(ret), ret);
+    return 0;
   }
   return device_count;
 }
@@ -86,6 +92,7 @@ cl_uint cluGetDevices(cl_platform_id platform, cl_device_type device_type, int m
   cl_int ret = clGetDeviceIDs(platform, device_type, device_count, *devices, NULL);
   if(CL_SUCCESS != ret){
     report(FAIL, "clGetDeviceIDs returned: %s (%d)", cluErrorString(ret), ret);
+    return 0;
   }
   return device_count;
 }
@@ -95,6 +102,7 @@ size_t cluDeviceGetInfoSize(cl_device_id device, cl_device_info param){
   cl_int ret = clGetDeviceInfo(device, param, 0, NULL, &size);
   if(CL_SUCCESS != ret){
     report(FAIL, "clGetDeviceInfo returned: %s (%d)", cluErrorString(ret), ret);
+    return 0;
   }
   return size;
 }
@@ -112,6 +120,7 @@ size_t cluGetDeviceInfo(cl_device_id device, cl_device_info param, int max_size,
     ret = clGetDeviceInfo(device, param, size, *output, NULL);
     if(CL_SUCCESS != ret){
       report(FAIL, "clGetDeviceInfo returned: %s (%d)", cluErrorString(ret), ret);
+      return 0;
     }
     return size;
   }
@@ -120,6 +129,7 @@ size_t cluGetDeviceInfo(cl_device_id device, cl_device_info param, int max_size,
     ret = clGetDeviceInfo(device, param, size, *output, NULL);
     if(CL_SUCCESS != ret){
       report(FAIL, "clGetDeviceInfo returned: %s (%d)", cluErrorString(ret), ret);
+      return 0;
     }
     return size;
   }
