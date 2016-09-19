@@ -1,6 +1,5 @@
 #ifndef _CLU_H
 #define _CLU_H
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -34,5 +33,4 @@ const char* cluErrorString(cl_int error);
 #ifdef __cplusplus
 }
 #endif
-
 #endif
