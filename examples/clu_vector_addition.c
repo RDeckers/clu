@@ -69,6 +69,12 @@ int main(int argc, char **argv){
   ret = clBuildProgram(program, device_count, devices, NULL, NULL, NULL);
   if(CL_SUCCESS != ret){
     report(FAIL, "clBuildProgram returned: %s (%d)", cluErrorString(ret), ret);
+    char *log = NULL;
+    for(int i = 0; i < device_count; i++){
+      cluGetProgramLog(program, devices[0], CLU_DYNAMIC, &log);
+      report(INFO, "log device[%d]\n==============\n%s",i, log);
+    }
+    free(log);
   }
   cl_kernel kernel = clCreateKernel(program, "vector_add", &ret);
   if(CL_SUCCESS != ret){

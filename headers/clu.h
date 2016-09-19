@@ -1,6 +1,10 @@
 #ifndef _CLU_H
 #define _CLU_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define CL_USE_DEPRECATED_OPENCL_1_2_APIS
 #include <CL/cl.h>
 
@@ -26,5 +30,9 @@ int cluGetProgramLog(cl_program program, cl_device_id device, int max_size, char
 size_t cluGetLogSize(cl_program program, cl_device_id device);
 
 const char* cluErrorString(cl_int error);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
