@@ -14,7 +14,7 @@ FIX_PATH = $(subst /,\,$1)
 	LIB_SUFFIX =.dll
 	OPENCL_HEADERS :=$(call rwildcard, Z:/include/CL/, *.h)
 else
-	REPORT = @echo -e "\e[4;1;37m$1\033[0m"
+	REPORT = echo "\033[4;1;37m$1\033[0m"
 	CHK_DIR_EXISTS = test -d $1 || mkdir -p $1
 	NUKE = rm -r $1
 	COPY_DIR = cp -r $1 $2
@@ -48,8 +48,8 @@ OBJ_FILES = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(C_FILES))
 
 LIB_NAME := clu
 
-LD_FLAGS += --std=gnu99 -march=native -lOpenCL -lutilities -L$(INSTALL_LIB_DIR)
-C_FLAGS += --std=gnu99 -O2 -pipe -march=native -I$(PROJECT_DIR)headers -I$(INSTALL_INCLUDE_DIR)
+LD_FLAGS += --std=gnu99 -march=native -lOpenCL -lutilities -L $(INSTALL_LIB_DIR)
+C_FLAGS += --std=gnu99 -O2 -pipe -march=native -I $(PROJECT_DIR)headers -I $(INSTALL_INCLUDE_DIR)
 
 
 lib: $(OBJ_FILES)
@@ -78,7 +78,7 @@ $(SRC_DIR)/%.c: $(SRC_DIR)/%.awk
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	$(call REPORT,Compiling $@)
 	$(call CHK_DIR_EXISTS, $(dir $@))
-	@gcc -fpic $(C_FLAGS) -o "$@" -c "$<"
+	gcc -fpic $(C_FLAGS) -o "$@" -c "$<"
 
 clean:
 	$(call REPORT,Cleaning...)
